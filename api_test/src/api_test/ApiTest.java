@@ -666,7 +666,57 @@ public class ApiTest {
 				results.add(status);
 				frame.revalidate();
 			}
+			new AppendTaskWithKey().execute();
+			return null;
+		}
+	}
+	
+	/**
+	 * Tests appending to a dataset
+	 *
+	 * @author bobby
+	 *
+	 */
+	class AppendTaskWithKey extends SwingWorker<Object, Object> {
+		/**
+		 * @throws Exception
+		 */
+		@Override
+		protected Object doInBackground() throws Exception {
+			JSONObject toAppend = new JSONObject();
+
+			String field1 = Long.toString(fields.get(0).field_id);
+			String field2 = Long.toString(fields.get(1).field_id);
+
+			try {
+				toAppend.put(field1, new JSONArray().put("2014/06/05 10:50:20"));
+				toAppend.put(field2, new JSONArray().put("250"));
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+			UploadInfo info = api.appendDataSetDataWithKey(dataSetInfo.dataSetId,
+					toAppend,"key");
+
+			JLabel status = new JLabel();
+			if (info.success) {
+				status.setText("Append data set success. id:" + dataSetInfo.dataSetId + " Data: 2014/06/05 10:50:20 , 250");
+				status.setAlignmentX(Component.CENTER_ALIGNMENT);
+				status.setForeground(Color.green);
+
+				results.add(status);
+				frame.revalidate();
+			} else {
+				status.setText("Append data set fail. Error Message:"
+						+ info.errorMessage);
+				status.setAlignmentX(Component.CENTER_ALIGNMENT);
+				status.setForeground(Color.red);
+
+				results.add(status);
+				frame.revalidate();
+			}
+
 			new ProjMediaTaskWithKey().execute();
+
 			return null;
 		}
 	}

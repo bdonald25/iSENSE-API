@@ -604,6 +604,57 @@ public class API {
 			info.dataSetId = -1;
 			return info;
 	}
+	
+	/**
+	 * Append new rows of data to the end of an existing data set ** This
+	 * currently works for horrible reasons regarding how the website handles
+	 * edit data sets ** Will fix hopefully --J
+	 *
+	 * @param dataSetId
+	 *            The ID of the data set to append to
+	 * @param newData
+	 *            The new data to append
+	 * @param conKey
+	 *            The Contributor Key
+	 *
+	 * @return success or failure
+	 */
+	public UploadInfo appendDataSetDataWithKey(int dataSetId, JSONObject newData, String conKey) {
+
+			UploadInfo info = new UploadInfo();
+			String reqResult = "";
+			JSONObject requestData = new JSONObject();
+
+			try {
+				requestData.put("contribution_key", conKey);
+				requestData.put("title", conKey);
+				requestData.put("id", dataSetId);
+				requestData.put("data", newData);
+				reqResult = makeRequest(baseURL, "data_sets/"
+						+ "append", "", "POST", requestData);
+				JSONObject jobj = new JSONObject(reqResult);
+				info.dataSetId = jobj.getInt("id");
+				if (jobj.getInt("id") != -1) {
+					info.success = true;
+				}
+				return info;
+			} catch (Exception e) {
+				try {
+					JSONObject jobj = new JSONObject(reqResult);
+					info.errorMessage = jobj.getString("msg");
+				} catch (Exception e2) {
+					try {
+						JSONObject jobj = new JSONObject(reqResult);
+						info.errorMessage = jobj.getString("error");
+					} catch (Exception e3) {
+						info.errorMessage = reqResult;
+					}
+				}
+			}
+			info.success = false;
+			info.dataSetId = -1;
+			return info;
+	}
 
 	public UploadInfo createKey(String project, String keyname, String key) {
 
